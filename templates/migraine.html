@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migraine Variants Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="wrapper">
+        <h1>Migraine Variants Classification</h1>
+        <div class="instructions">
+            Please provide information about your headache symptoms. All fields are required for accurate prediction.<br/>
+            <strong>⚠️ Disclaimer:</strong> This tool is for assistance purposes only and should not replace professional medical advice.
+        </div>
+        
+        <div class="form-container">
+            <form id="predictionForm">
+                <div class="form-grid">
+                    <!-- COLUMN 1: Personal Info, Pain Characteristics, Family History -->
+                    <div>
+                        <!-- Patient Information Group -->
+                        <div class="feature-group">
+                            <h3>Patient Information</h3>
+                            <div class="form-group">
+                                <label for="age">Age</label>
+                                <div class="input-description">Enter your age</div>
+                                <input type="number" id="age" name="age" required min="1" max="120">
+                            </div>
+                            <div class="form-group">
+                                <label for="frequency">Frequency</label>
+                                <div class="input-description">How many episodes per month?</div>
+                                <input type="number" id="frequency" name="frequency" required min="0" max="30">
+                            </div>
+                        </div>
+                        
+                        <!-- Pain Characteristics Group -->
+                        <div class="feature-group">
+                            <h3>Pain Characteristics</h3>
+                            <div class="form-group">
+                                <label for="location">Pain Location</label>
+                                <div class="input-description">Is the pain on one side (Unilateral) or both (Bilateral)?</div>
+                                <select id="location" name="location" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Location.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="character">Pain Character</label>
+                                <div class="input-description">Is the pain throbbing or constant?</div>
+                                <select id="character" name="character" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Character.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="intensity">Pain Intensity</label>
+                                <div class="input-description">How intense is the pain?</div>
+                                <select id="intensity" name="intensity" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Intensity.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Family History Group -->
+                        <div class="feature-group">
+                            <h3>Family History</h3>
+                            <div class="form-group">
+                                <label for="dpf">DPF</label>
+                                <div class="input-description">Family background of migraine?</div>
+                                <select id="dpf" name="dpf" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.DPF.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- COLUMN 2: Aura Symptoms, Sensory Symptoms, Gastrointestinal Symptoms -->
+                    <div>
+                        <!-- Aura Symptoms Group -->
+                        <div class="feature-group">
+                            <h3>Aura Symptoms</h3>
+                            <div class="form-group">
+                                <label for="visual">Visual Symptoms</label>
+                                <div class="input-description">Number of reversible visual symptoms</div>
+                                <input type="number" id="visual" name="visual" required min="0" max="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="sensory">Sensory Symptoms</label>
+                                <div class="input-description">Number of reversible sensory symptoms</div>
+                                <input type="number" id="sensory" name="sensory" required min="0" max="10">
+                            </div>
+                        </div>
+                        
+                        <!-- Sensory Symptoms Group -->
+                        <div class="feature-group">
+                            <h3>Sensory Symptoms</h3>
+                            <div class="form-group">
+                                <label for="phonophobia">Phonophobia</label>
+                                <div class="input-description">Noise sensitivity?</div>
+                                <select id="phonophobia" name="phonophobia" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Phonophobia.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="photophobia">Photophobia</label>
+                                <div class="input-description">Light sensitivity?</div>
+                                <select id="photophobia" name="photophobia" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Photophobia.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Gastrointestinal Symptoms Group -->
+                        <div class="feature-group">
+                            <h3>Gastrointestinal Symptoms</h3>
+                            <div class="form-group">
+                                <label for="vomit">Vomiting</label>
+                                <div class="input-description">Do you experience vomiting?</div>
+                                <select id="vomit" name="vomit" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Vomit.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- COLUMN 3: Neurological Symptoms -->
+                    <div>
+                        <!-- Neurological Symptoms Group -->
+                        <div class="feature-group">
+                            <h3>Neurological Symptoms</h3>
+                            <div class="form-group">
+                                <label for="dysphasia">Dysphasia</label>
+                                <div class="input-description">Speech coordination issues?</div>
+                                <select id="dysphasia" name="dysphasia" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Dysphasia.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vertigo">Vertigo</label>
+                                <div class="input-description">Do you feel dizzy?</div>
+                                <select id="vertigo" name="vertigo" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Vertigo.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tinnitus">Tinnitus</label>
+                                <div class="input-description">Ear ringing?</div>
+                                <select id="tinnitus" name="tinnitus" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Tinnitus.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="hypoacusis">Hypoacusis</label>
+                                <div class="input-description">Hearing loss?</div>
+                                <select id="hypoacusis" name="hypoacusis" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Hypoacusis.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="defect">Visual Defect</label>
+                                <div class="input-description">Any visual field defects?</div>
+                                <select id="defect" name="defect" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Defect.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="conscience">Conscience</label>
+                                <div class="input-description">Jeopardized consciousness?</div>
+                                <select id="conscience" name="conscience" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Conscience.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-container">
+                    <button type="button" class="back-button" id="backButton">← Back</button>
+                    <button type="submit" class="gradient-button">Classify Migraine Variants</button>
+                </div>
+                <div id="errorMessage" class="error-message">
+                    Please provide symptom information before submitting.
+                </div>
+            </form>
+        </div>
+        
+        <div id="result" class="result-container">
+            <h2>Prediction Result</h2>
+            <p id="predictionText"></p>
+            <p id="confidenceText"></p>
+            <button id="showPlots" class="gradient-button">Show Interpretability Plots</button>
+        </div>
+        
+        <div id="recommendation" class="recommendation-container">
+            <h3>Recommendation</h3>
+            <p id="recommendationText"></p>
+            <button id="actionButton" class="action-button">Check Out Now!</button>
+        </div>
+        
+        <div id="plots" class="plots-container">
+            <h2>Interpretability Plots</h2>
+            <div id="plotContainer"></div>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.getElementById('backButton').addEventListener('click', function() {
+            if (confirm('Are you sure you want to go back? Any unsaved data will be lost.')) {
+                window.location.href = '/';
+            }
+        });
+        
+        document.getElementById('actionButton').addEventListener('click', function() {
+            window.location.href = '/headache';
+        });
+        
+        document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading indicator
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Predicting...';
+            submitButton.disabled = true;
+            
+            const formData = new FormData(this);
+            
+            try {
+                console.log('Submitting migraine form...');
+                const response = await fetch('/predict_migraine', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Server error');
+                }
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                document.getElementById('predictionText').innerHTML = 
+                    'Predicted Migraine Variants: <span class="migraine-type">' + data.prediction + '</span>';
+                document.getElementById('confidenceText').innerHTML = 
+                    'Confidence: <span class="confidence-value">' + (data.confidence * 100).toFixed(2) + '%</span>';
+                document.getElementById('result').style.display = 'block';
+                
+                if (data.recommendation === 'headache') {
+                    document.getElementById('recommendationText').innerHTML =
+                        'Your symptoms suggest a type of <span class="highlight">migraine</span> that may need further classification. ' +
+                        'We recommend trying our <span class="highlight">Headache Disorder Classification tool</span> to get a more specific diagnosis.';
+                    document.getElementById('recommendation').style.display = 'block';
+                } else {
+                    document.getElementById('recommendation').style.display = 'none';
+                }
+                
+                // Store plots for later use
+                window.currentPlots = data.plots;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            } finally {
+                // Reset button
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            }
+        });
+        
+        document.getElementById('showPlots').addEventListener('click', function() {
+            const plotContainer = document.getElementById('plotContainer');
+            plotContainer.innerHTML = '';
+            
+            // SHAP plot
+            if (window.currentPlots && window.currentPlots.shap) {
+                const shapImg = document.createElement('img');
+                shapImg.src = 'data:image/png;base64,' + window.currentPlots.shap;
+                shapImg.alt = 'SHAP Waterfall Plot';
+                shapImg.className = 'plot-img';
+                plotContainer.appendChild(shapImg);
+            }
+            
+            // LIME plot
+            if (window.currentPlots && window.currentPlots.lime) {
+                const limeImg = document.createElement('img');
+                limeImg.src = 'data:image/png;base64,' + window.currentPlots.lime;
+                limeImg.alt = 'LIME Plot';
+                limeImg.className = 'plot-img';
+                plotContainer.appendChild(limeImg);
+            }
+            
+            document.getElementById('plots').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Headache & Migraine Classification System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container landing-container">
+        <div class="icon">🧠</div>
+        <h1>Primary Headache Disorder & Migraine Variants Classification System</h1>
+        <p class="description">
+            This tool helps classify different types of headaches and migraines based on symptoms.
+            Select the classification type below to get started.
+        </p>
+        <div class="buttons">
+            <a href="{{ url_for('migraine') }}" class="btn">Migraine Variants Classification</a>
+            <a href="{{ url_for('headache') }}" class="btn">Primary Headache Disorder Classification</a>
+        </div>
+        <div class="footer">
+            <p>This tool is for assistance purposes only and should not replace professional medical advice.</p>
+        </div>
+    </div>
+</body>
+</html>
