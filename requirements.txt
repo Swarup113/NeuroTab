@@ -2,9 +2,9 @@ Flask==3.1.1
 gunicorn==23.0.0
 torch==2.5.1
 numpy==1.26.4
-pandas==2.0.3
+pandas==2.2.3
 scikit-learn==1.7.1
 shap==0.48.0
 lime==0.2.0.1
 matplotlib==3.9.2
-python-3.11.8
+wheel==0.44.0
