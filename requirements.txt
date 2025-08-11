@@ -7,3 +7,4 @@ scikit-learn==1.7.1
 shap==0.48.0
 lime==0.2.0.1
 matplotlib==3.9.2
+python-3.11.8
