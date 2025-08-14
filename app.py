@@ -704,7 +704,7 @@ def generate_plots(model, scaler, input_data, class_names, prediction, feature_n
         shap_values = explainer_shap(X_one_df)
         
         # Plot SHAP waterfall for predicted class only with larger figure size
-        plt.figure(figsize=(12, 8))  # Increased figure size
+        plt.figure(figsize=(10, 6))  # Increased figure size
         shap.plots.waterfall(shap_values[0][:, prediction], show=False)
         
         # Add explanation text
@@ -728,7 +728,7 @@ def generate_plots(model, scaler, input_data, class_names, prediction, feature_n
             explainer_fallback = shap.KernelExplainer(predict_fn, background_scaled)
             shap_values_fallback = explainer_fallback.shap_values(input_data)
             
-            plt.figure(figsize=(12, 8))  # Consistent figure size
+            plt.figure(figsize=(10, 6))  # Consistent figure size
             
             # For multi-class models, shap_values is a list of arrays (one per class)
             if isinstance(shap_values_fallback, list):
@@ -792,7 +792,7 @@ def generate_plots(model, scaler, input_data, class_names, prediction, feature_n
         
         # Get the explanation for the predicted class
         lime_exp = exp_lime.as_list(label=prediction)
-        fig, ax = plt.subplots(figsize=(12, 8))  # Consistent figure size
+        fig, ax = plt.subplots(figsize=(10, 6))  # Consistent figure size
         
         # Extract feature names and values
         features = [x[0] for x in lime_exp]
@@ -822,7 +822,7 @@ def generate_plots(model, scaler, input_data, class_names, prediction, feature_n
         plt.close()
     except Exception as e:
         print(f"Error generating LIME plot: {str(e)}")
-        plt.figure(figsize=(12, 8))
+        plt.figure(figsize=(10, 6))
         plt.text(0.5, 0.5, f'LIME Plot Error: {str(e)}', ha='center', va='center')
         buf = BytesIO()
         plt.savefig(buf, format='png', bbox_inches='tight')
