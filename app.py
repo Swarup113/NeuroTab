@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
+from datetime import datetime
 import torch
 import torch.nn as nn
 import math
@@ -16,11 +17,11 @@ from io import BytesIO
 import base64
 import os
 import warnings
-
 # Suppress warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
+# Initialize Flask app
 app = Flask(__name__)
 
 # Define the model classes (same as in your training code)
@@ -433,7 +434,7 @@ plot_explanations = {
 # Routes
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', now=datetime.now())
 
 @app.route('/migraine')
 def migraine():

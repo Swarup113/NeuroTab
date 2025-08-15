@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Headache Classification</title>
+    <title>NeuroTab - Headache Classification</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 </head>
 <body>
     <div class="container">
-        <h1>Primary Headache Disorder Classification</h1>
+        <div class="header">
+            <h1>NeuroTab: Primary Headache Disorder Classification</h1>
+            <span class="clinical-badge">Clinical AI Tool</span>
+        </div>
+        
         <div class="instructions">
-            Please provide information about your headache symptoms. All fields are required for accurate prediction.<br/>
+            <strong>Instructions:</strong> Please provide information about your headache symptoms. All fields are required for accurate prediction.<br/>
             <strong>⚠️ Disclaimer:</strong> This tool is for assistance purposes only and should not replace professional medical advice.
         </div>
         
@@ -231,20 +236,20 @@
         </div>
         
         <div id="result" class="result-container">
-            <h2>Prediction Result</h2>
+            <h2>NeuroTab Prediction Result</h2>
             <p id="predictionText"></p>
             <p id="confidenceText"></p>
             <button id="showPlots" class="gradient-button">Show Interpretability Plots</button>
         </div>
         
         <div id="recommendation" class="recommendation-container">
-            <h3>Recommendation</h3>
+            <h3>NeuroTab Recommendation</h3>
             <p id="recommendationText"></p>
             <button id="actionButton" class="action-button">Check Out Now!</button>
         </div>
         
         <div id="plots" class="plots-container">
-            <h2>Interpretability Plots</h2>
+            <h2>NeuroTab Interpretability Plots</h2>
             <div id="plotContainer"></div>
         </div>
     </div>
@@ -267,7 +272,7 @@
             // Show loading indicator
             const submitButton = this.querySelector('button[type="submit"]');
             const originalText = submitButton.textContent;
-            submitButton.textContent = 'Predicting...';
+            submitButton.innerHTML = '<span class="loading-spinner"></span> Predicting...';
             submitButton.disabled = true;
             
             const formData = new FormData(this);
@@ -302,7 +307,7 @@
                 if (data.recommendation === 'migraine') {
                     document.getElementById('recommendationText').innerHTML =
                         'Your symptoms suggest you may have <span class="highlight">migraines</span>. ' +
-                        'We recommend trying our <span class="highlight">Migraine Variants Classification tool</span> to determine the specific type of migraine.';
+                        'NeuroTab recommends trying our <span class="highlight">Migraine Variants Classification tool</span> to determine the specific type of migraine.';
                     document.getElementById('recommendation').style.display = 'block';
                 } else {
                     document.getElementById('recommendation').style.display = 'none';
@@ -328,7 +333,7 @@
             if (window.currentPlots && window.currentPlots.shap) {
                 const shapImg = document.createElement('img');
                 shapImg.src = 'data:image/png;base64,' + window.currentPlots.shap;
-                shapImg.alt = 'SHAP Waterfall Plot';
+                shapImg.alt = 'NeuroTab SHAP Waterfall Plot';
                 shapImg.className = 'plot-img';
                 plotContainer.appendChild(shapImg);
             }
@@ -337,7 +342,7 @@
             if (window.currentPlots && window.currentPlots.lime) {
                 const limeImg = document.createElement('img');
                 limeImg.src = 'data:image/png;base64,' + window.currentPlots.lime;
-                limeImg.alt = 'LIME Plot';
+                limeImg.alt = 'NeuroTab LIME Plot';
                 limeImg.className = 'plot-img';
                 plotContainer.appendChild(limeImg);
             }

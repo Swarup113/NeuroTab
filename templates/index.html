@@ -3,23 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Headache & Migraine Classification System</title>
+    <title>NeuroTab - Headache & Migraine Classification System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 </head>
 <body>
     <div class="container landing-container">
-        <div class="icon">🧠</div>
-        <h1>Primary Headache Disorder & Migraine Variants Classification System</h1>
+        <div class="header">
+            <h1>NeuroTab: Headache & Migraine Classification System</h1>
+            
+        </div>
+        
         <p class="description">
-            This tool helps classify different types of headaches and migraines based on symptoms.
+            NeuroTab is a clinical diagnostic tool that helps classify different types of headaches and migraines based on symptoms.
             Select the classification type below to get started.
         </p>
+        
         <div class="buttons">
-            <a href="{{ url_for('migraine') }}" class="btn">Migraine Variants Classification</a>
-            <a href="{{ url_for('headache') }}" class="btn">Primary Headache Disorder Classification</a>
+            <a href="{{ url_for('migraine') }}" class="btn">Migraine Variants</a>
+            <a href="{{ url_for('headache') }}" class="btn">Primary Headaches</a>
         </div>
+        
+        <div class="instructions">
+            <strong>⚠️ Disclaimer:</strong> This tool is for assistance purposes only and should not replace professional medical advice.
+        </div>
+        
         <div class="footer">
-            <p>This tool is for assistance purposes only and should not replace professional medical advice.</p>
+            <p>© 2025 NeuroTab. All rights reserved.</p>
         </div>
     </div>
 </body>
