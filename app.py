@@ -834,4 +834,4 @@ def generate_plots(model, scaler, input_data, class_names, prediction, feature_n
     return plots
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=7860)
