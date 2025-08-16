@@ -6,12 +6,13 @@
     <title>NeuroTab - Headache Classification</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>NeuroTab: Primary Headache Disorder Classification</h1>
-            <span class="clinical-badge">Clinical AI Tool</span>
+            <span class="clinical-badge">Clinical Tool</span>
         </div>
         
         <div class="instructions">
@@ -26,7 +27,7 @@
                     <div>
                         <!-- Pain Characteristics Group -->
                         <div class="feature-group">
-                            <h3>Pain Characteristics</h3>
+                            <h3><i class="fas fa-exclamation-triangle"></i> Pain Characteristics</h3>
                             <div class="form-group">
                                 <label for="durationGroup">Duration Group</label>
                                 <div class="input-description">How long do your headaches typically last?</div>
@@ -61,7 +62,7 @@
                         
                         <!-- Sensory Symptoms Group -->
                         <div class="feature-group">
-                            <h3>Sensory Symptoms</h3>
+                            <h3><i class="fas fa-eye"></i> Sensory Symptoms</h3>
                             <div class="form-group">
                                 <label for="photophobia">Photophobia</label>
                                 <div class="input-description">Are you sensitive to light?</div>
@@ -96,7 +97,7 @@
                     <div>
                         <!-- Location Features Group -->
                         <div class="feature-group">
-                            <h3>Location Features</h3>
+                            <h3><i class="fas fa-map-marker-alt"></i> Location Features</h3>
                             <div class="form-group">
                                 <label for="location">Location</label>
                                 <div class="input-description">Where is the pain located?</div>
@@ -111,7 +112,7 @@
                         
                         <!-- Autonomic Symptoms Group -->
                         <div class="feature-group">
-                            <h3>Autonomic Symptoms</h3>
+                            <h3><i class="fas fa-lungs"></i> Autonomic Symptoms</h3>
                             <div class="form-group">
                                 <label for="lacrimation">Lacrimation</label>
                                 <div class="input-description">Do you experience tearing?</div>
@@ -164,7 +165,7 @@
                     <div>
                         <!-- Other Symptoms Group -->
                         <div class="feature-group">
-                            <h3>Other Symptoms</h3>
+                            <h3><i class="fas fa-notes-medical"></i> Other Symptoms</h3>
                             <div class="form-group">
                                 <label for="pericranial">Pericranial Tenderness</label>
                                 <div class="input-description">Do you experience tenderness in the scalp?</div>
@@ -196,7 +197,7 @@
                         
                         <!-- Gastrointestinal Symptoms Group -->
                         <div class="feature-group">
-                            <h3>Gastrointestinal Symptoms</h3>
+                            <h3><i class="fas fa-stomach"></i> Gastrointestinal Symptoms</h3>
                             <div class="form-group">
                                 <label for="nausea">Nausea</label>
                                 <div class="input-description">Do you experience nausea?</div>
@@ -210,7 +211,7 @@
                         
                         <!-- Headache Duration Group -->
                         <div class="feature-group">
-                            <h3>Headache Duration</h3>
+                            <h3><i class="fas fa-clock"></i> Headache Duration</h3>
                             <div class="form-group">
                                 <label for="headache_days">Headache Days</label>
                                 <div class="input-description">First headache experience since:</div>
@@ -226,8 +227,12 @@
                 </div>
                 
                 <div class="button-container">
-                    <button type="button" class="back-button" id="backButton">← Back</button>
-                    <button type="submit" class="gradient-button">Classify Headache Disorders</button>
+                    <button type="button" class="back-button" id="backButton">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button type="submit" class="gradient-button">
+                        <i class="fas fa-brain"></i> Classify Headache Disorders
+                    </button>
                 </div>
                 <div id="errorMessage" class="error-message">
                     Please provide symptom information before submitting.
@@ -236,20 +241,30 @@
         </div>
         
         <div id="result" class="result-container">
-            <h2>NeuroTab Prediction Result</h2>
+            <h2><i class="fas fa-chart-line"></i> NeuroTab Prediction Result</h2>
             <p id="predictionText"></p>
-            <p id="confidenceText"></p>
-            <button id="showPlots" class="gradient-button">Show Interpretability Plots</button>
+            <div class="confidence-container">
+                <div class="confidence-label">Confidence Level:</div>
+                <div class="confidence-bar-container">
+                    <div class="confidence-bar" id="confidenceBar"></div>
+                    <div class="confidence-text" id="confidenceText"></div>
+                </div>
+            </div>
+            <button id="showPlots" class="gradient-button">
+                <i class="fas fa-chart-bar"></i> Show Interpretability Plots
+            </button>
         </div>
         
         <div id="recommendation" class="recommendation-container">
-            <h3>NeuroTab Recommendation</h3>
+            <h3><i class="fas fa-lightbulb"></i> NeuroTab Recommendation</h3>
             <p id="recommendationText"></p>
-            <button id="actionButton" class="action-button">Check Out Now!</button>
+            <button id="actionButton" class="action-button">
+                <i class="fas fa-arrow-right"></i> Check Out Now!
+            </button>
         </div>
         
         <div id="plots" class="plots-container">
-            <h2>NeuroTab Interpretability Plots</h2>
+            <h2><i class="fas fa-chart-pie"></i> NeuroTab Interpretability Plots</h2>
             <div id="plotContainer"></div>
         </div>
     </div>
@@ -271,7 +286,7 @@
             
             // Show loading indicator
             const submitButton = this.querySelector('button[type="submit"]');
-            const originalText = submitButton.textContent;
+            const originalText = submitButton.innerHTML;
             submitButton.innerHTML = '<span class="loading-spinner"></span> Predicting...';
             submitButton.disabled = true;
             
@@ -300,8 +315,22 @@
                 
                 document.getElementById('predictionText').innerHTML = 
                     'Predicted Headache Type: <span class="headache-type">' + data.prediction + '</span>';
-                document.getElementById('confidenceText').innerHTML = 
-                    'Confidence: <span class="confidence-value">' + (data.confidence * 100).toFixed(2) + '%</span>';
+                
+                // Update confidence bar
+                const confidencePercentage = (data.confidence * 100).toFixed(2);
+                document.getElementById('confidenceText').innerHTML = confidencePercentage + '%';
+                document.getElementById('confidenceBar').style.width = confidencePercentage + '%';
+                
+                // Set color based on confidence level
+                const confidenceBar = document.getElementById('confidenceBar');
+                if (confidencePercentage >= 90) {
+                    confidenceBar.style.backgroundColor = '#4caf50'; // Green
+                } else if (confidencePercentage >= 70) {
+                    confidenceBar.style.backgroundColor = '#ff9800'; // Orange
+                } else {
+                    confidenceBar.style.backgroundColor = '#f44336'; // Red
+                }
+                
                 document.getElementById('result').style.display = 'block';
                 
                 if (data.recommendation === 'migraine') {
@@ -320,7 +349,7 @@
                 alert('Error: ' + error.message);
             } finally {
                 // Reset button
-                submitButton.textContent = originalText;
+                submitButton.innerHTML = originalText;
                 submitButton.disabled = false;
             }
         });
