@@ -9,9 +9,52 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar" id="navbar">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="{{ url_for('index') }}" class="nav-link">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('migraine') }}" class="nav-link active">
+                    <i class="fas fa-head-side-virus"></i> Migraine
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('headache') }}" class="nav-link">
+                    <i class="fas fa-head-side-mask"></i> Headache
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Navbar scroll behavior
+        let lastScrollTop = 0;
+        const navbar = document.getElementById('navbar');
+        
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // Scrolling down
+                navbar.style.transform = 'translateY(-100%)';
+                navbar.style.opacity = '0';
+            } else {
+                // Scrolling up
+                navbar.style.transform = 'translateY(0)';
+                navbar.style.opacity = '1';
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+    </script>
     <div class="wrapper">
         <div class="header">
-            <h1>NeuroTab: Migraine Variants Classification</h1>
+            <h1>NeuroTab: Migraine Variants Classification</h1><br>
             <span class="clinical-badge">Clinical Tool</span>
         </div>
         
@@ -33,10 +76,15 @@
                                 <div class="input-description">Enter your age</div>
                                 <input type="number" id="age" name="age" required min="1" max="120">
                             </div>
-                            <div class="form-group">
-                                <label for="frequency">Frequency</label>
-                                <div class="input-description">How many episodes per month?</div>
-                                <input type="number" id="frequency" name="frequency" required min="0" max="30">
+                                                        <div class="form-group">
+                                <label for="dpf">DPF</label>
+                                <div class="input-description">Family background of migraine?</div>
+                                <select id="dpf" name="dpf" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.DPF.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                         
@@ -73,83 +121,18 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                        </div>
-                        
-                        <!-- Family History Group -->
-                        <div class="feature-group">
-                            <h3><i class="fas fa-dna"></i> Family History</h3>
-                            <div class="form-group">
-                                <label for="dpf">DPF</label>
-                                <div class="input-description">Family background of migraine?</div>
-                                <select id="dpf" name="dpf" required>
-                                    <option value="">Select</option>
-                                    {% for value, key in mappings.DPF.items() %}
-                                    <option value="{{ value }}">{{ value }}</option>
-                                    {% endfor %}
-                                </select>
+                                                        <div class="form-group">
+                                <label for="frequency">Frequency</label>
+                                <div class="input-description">How many episodes per month?</div>
+                                <input type="number" id="frequency" name="frequency" required min="0" max="30">
                             </div>
                         </div>
+                        
                     </div>
                     
-                    <!-- COLUMN 2: Aura Symptoms, Sensory Symptoms, Gastrointestinal Symptoms -->
-                    <div>
-                        <!-- Aura Symptoms Group -->
-                        <div class="feature-group">
-                            <h3><i class="fas fa-eye"></i> Aura Symptoms</h3>
-                            <div class="form-group">
-                                <label for="visual">Visual Symptoms</label>
-                                <div class="input-description">Number of reversible visual symptoms</div>
-                                <input type="number" id="visual" name="visual" required min="0" max="10">
-                            </div>
-                            <div class="form-group">
-                                <label for="sensory">Sensory Symptoms</label>
-                                <div class="input-description">Number of reversible sensory symptoms</div>
-                                <input type="number" id="sensory" name="sensory" required min="0" max="10">
-                            </div>
-                        </div>
-                        
-                        <!-- Sensory Symptoms Group -->
-                        <div class="feature-group">
-                            <h3><i class="fas fa-eye"></i> Sensory Symptoms</h3>
-                            <div class="form-group">
-                                <label for="phonophobia">Phonophobia</label>
-                                <div class="input-description">Noise sensitivity?</div>
-                                <select id="phonophobia" name="phonophobia" required>
-                                    <option value="">Select</option>
-                                    {% for value, key in mappings.Phonophobia.items() %}
-                                    <option value="{{ value }}">{{ value }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="photophobia">Photophobia</label>
-                                <div class="input-description">Light sensitivity?</div>
-                                <select id="photophobia" name="photophobia" required>
-                                    <option value="">Select</option>
-                                    {% for value, key in mappings.Photophobia.items() %}
-                                    <option value="{{ value }}">{{ value }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <!-- Gastrointestinal Symptoms Group -->
-                        <div class="feature-group">
-                            <h3><i class="fas fa-virus"></i> Gastrointestinal Symptoms</h3>
-                            <div class="form-group">
-                                <label for="vomit">Vomiting</label>
-                                <div class="input-description">Do you experience vomiting?</div>
-                                <select id="vomit" name="vomit" required>
-                                    <option value="">Select</option>
-                                    {% for value, key in mappings.Vomit.items() %}
-                                    <option value="{{ value }}">{{ value }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
                     
-                    <!-- COLUMN 3: Neurological Symptoms -->
+                    
+                    <!-- COLUMN 2: Neurological Symptoms -->
                     <div>
                         <!-- Neurological Symptoms Group -->
                         <div class="feature-group">
@@ -210,6 +193,59 @@
                                 <select id="conscience" name="conscience" required>
                                     <option value="">Select</option>
                                     {% for value, key in mappings.Conscience.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- COLUMN 3: Aura Symptoms, Sensory Symptoms, Gastrointestinal Symptoms -->
+                    <div>
+                        <!-- Aura Symptoms Group -->
+                        <div class="feature-group">
+                            <h3><i class="fas fa-eye"></i> Aura and Sensory Symptoms</h3>
+                            <div class="form-group">
+                                <label for="visual">Visual Symptoms</label>
+                                <div class="input-description">Number of reversible visual symptoms</div>
+                                <input type="number" id="visual" name="visual" required min="0" max="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="sensory">Sensory Symptoms</label>
+                                <div class="input-description">Number of reversible sensory symptoms</div>
+                                <input type="number" id="sensory" name="sensory" required min="0" max="10">
+                            </div>
+                             <div class="form-group">
+                                <label for="phonophobia">Phonophobia</label>
+                                <div class="input-description">Noise sensitivity?</div>
+                                <select id="phonophobia" name="phonophobia" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Phonophobia.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="photophobia">Photophobia</label>
+                                <div class="input-description">Light sensitivity?</div>
+                                <select id="photophobia" name="photophobia" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Photophobia.items() %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        
+                        <!-- Gastrointestinal Symptoms Group -->
+                        <div class="feature-group">
+                            <h3><i class="fas fa-virus"></i> Gastrointestinal Symptoms</h3>
+                            <div class="form-group">
+                                <label for="vomit">Vomiting</label>
+                                <div class="input-description">Do you experience vomiting?</div>
+                                <select id="vomit" name="vomit" required>
+                                    <option value="">Select</option>
+                                    {% for value, key in mappings.Vomit.items() %}
                                     <option value="{{ value }}">{{ value }}</option>
                                     {% endfor %}
                                 </select>
