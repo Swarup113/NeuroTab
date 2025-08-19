@@ -114,13 +114,16 @@ h3 {
     height: 100%;
 }
 .nav-link:hover {
-    color: var(--secondary-color);
-    background-color: rgba(33, 150, 243, 0.1);
+    background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    color: white; /* keep text white on hover */
 }
 .nav-link.active {
+    border-radius: 50px; /* pill shape already present */
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
     color: white;
-    background-color: var(--primary-color);
-    box-shadow: 0 2px 5px rgba(25, 118, 210, 0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 .nav-link i {
     font-size: 1rem;
@@ -341,7 +344,7 @@ select option {
 }
 #confidenceText {
     font-size: 18px;
-    color: var(--gray-dark);
+    color: var(--dark-color);
 }
 .confidence-container {
     margin: 15px 0;
@@ -484,7 +487,7 @@ select option {
     text-align: center;
 }
 .features-section h2 {
-    color: var(--primary-color);
+    color: var(--secondary-color);
     margin-bottom: 25px;
     position: relative;
     display: inline-block;
@@ -497,7 +500,7 @@ select option {
     transform: translateX(-50%);
     width: 60px;
     height: 3px;
-    background-color: var(--accent-color);
+    background-color: var(--primary-color);
     border-radius: 2px;
 }
 .features-grid {
@@ -633,6 +636,12 @@ select option {
 #recommendationText {
     font-size: 20px;
     margin-bottom: 10px;
+}
+#recommendationText .headache-type,
+#recommendationText .migraine-type,
+#recommendationText .highlight {
+    color: var(--primary-color);
+    font-weight: 700;
 }
 /* Updated Recommendation Button Styles */
 .recommendation-container .action-button {
