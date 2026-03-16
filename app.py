@@ -21,6 +21,45 @@ import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
+# Download model files from HF Space at runtime
+from huggingface_hub import hf_hub_download
+import os
+
+def ensure_models():
+    model_files = [
+        "headache_model.pth",
+        "headache_scaler.pkl", 
+        "migraine_model.pth",
+        "migraine_scaler.pkl"
+    ]
+    for filename in model_files:
+        if not os.path.exists(filename):
+            print(f"Downloading {filename}...")
+            hf_hub_download(
+                repo_id="dewanjee/NeuroTab",
+                filename=filename,
+                repo_type="space",
+                local_dir="."
+            )
+            print(f"Downloaded {filename}")
+
+ensure_models()
+```
+
+Then add `huggingface_hub` to your `requirements.txt`:
+```
+--extra-index-url https://download.pytorch.org/whl/cpu
+Flask==3.1.1
+gunicorn==23.0.0
+torch==2.5.1+cpu
+numpy==1.26.4
+pandas==2.2.3
+scikit-learn==1.7.1
+shap==0.48.0
+lime==0.2.0.1
+matplotlib==3.9.2
+huggingface_hub
+
 # Initialize Flask app
 app = Flask(__name__)
 
