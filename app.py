@@ -11,16 +11,17 @@ import shap
 import lime
 import lime.lime_tabular
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg')  # Set backend before importing pyplot
 import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
 import os
 import warnings
-from huggingface_hub import hf_hub_download
-
+# Suppress warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
+
+
 
 def ensure_models():
     model_files = [
@@ -39,11 +40,13 @@ def ensure_models():
                 local_dir="."
             )
             print(f"Downloaded {filename}")
-
+ 
 ensure_models()
 
+# Initialize Flask app
 app = Flask(__name__)
 
+# Define the model classes (same as in your training code)
 class GLULayer(nn.Module):
     def __init__(self, input_dim, output_dim, dropout=0.1):
         super(GLULayer, self).__init__()
@@ -114,7 +117,7 @@ class AttentiveTransformer(nn.Module):
 class DecisionStep(nn.Module):
     def __init__(self, input_dim, feature_dim, output_dim, shared_layers=None, n_glu=2, gamma=1.3, dropout=0.1):
         super().__init__()
-        self.gamma = gamma
+        self.gamma=gamma
         self.attentive_transformer = AttentiveTransformer(
             input_dim=feature_dim // 2,
             output_dim=input_dim
@@ -225,49 +228,105 @@ class CustomTabNetClassifier(nn.Module):
         encoded = self.encoder(x)
         return self.head(encoded)
 
+# Load models and scalers
 def load_model(model_path, scaler_path, num_classes):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    # Load model with weights_only=True to avoid security warning
     try:
         checkpoint = torch.load(model_path, map_location=device, weights_only=True)
     except Exception as e:
         print(f"Warning: Could not load with weights_only=True. Error: {e}")
+        print("Falling back to weights_only=False")
         checkpoint = torch.load(model_path, map_location=device, weights_only=False)
+    
     model_config = checkpoint['model_config']
     model_config['num_classes'] = num_classes
+    
     model = CustomTabNetClassifier(**model_config).to(device)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
+    
+    # Load scaler
     with open(scaler_path, 'rb') as f:
         scaler = pickle.load(f)
+    
     return model, scaler
 
+# Load the models
 try:
     migraine_model, migraine_scaler = load_model('migraine_model.pth', 'migraine_scaler.pkl', num_classes=7)
     headache_model, headache_scaler = load_model('headache_model.pth', 'headache_scaler.pkl', num_classes=3)
     print("Models loaded successfully")
 except Exception as e:
     print(f"Error loading models: {e}")
+    # Create dummy models if loading fails
     migraine_model = None
     migraine_scaler = None
     headache_model = None
     headache_scaler = None
 
+# Define feature mappings for migraine dataset
 migraine_mappings = {
-    'Location': {'None': 0, 'Unilateral': 1, 'Bilateral': 2},
-    'Character': {'None': 0, 'Throbbing': 1, 'Constant': 2},
-    'Intensity': {'None': 0, 'Mild': 1, 'Medium': 2, 'Severe': 3},
-    'Vomit': {'No': 0, 'Yes': 1},
-    'Phonophobia': {'No': 0, 'Yes': 1},
-    'Photophobia': {'No': 0, 'Yes': 1},
-    'Dysphasia': {'No': 0, 'Yes': 1},
-    'Vertigo': {'No': 0, 'Yes': 1},
-    'Tinnitus': {'No': 0, 'Yes': 1},
-    'Hypoacusis': {'No': 0, 'Yes': 1},
-    'Defect': {'No': 0, 'Yes': 1},
-    'Conscience': {'No': 0, 'Yes': 1},
-    'DPF': {'No': 0, 'Yes': 1}
+    'Location': {
+        'None': 0,
+        'Unilateral': 1,
+        'Bilateral': 2
+    },
+    'Character': {
+        'None': 0,
+        'Throbbing': 1,
+        'Constant': 2
+    },
+    'Intensity': {
+        'None': 0,
+        'Mild': 1,
+        'Medium': 2,
+        'Severe': 3
+    },
+    'Vomit': {
+        'No': 0,
+        'Yes': 1
+    },
+    'Phonophobia': {
+        'No': 0,
+        'Yes': 1
+    },
+    'Photophobia': {
+        'No': 0,
+        'Yes': 1
+    },
+    'Dysphasia': {
+        'No': 0,
+        'Yes': 1
+    },
+    'Vertigo': {
+        'No': 0,
+        'Yes': 1
+    },
+    'Tinnitus': {
+        'No': 0,
+        'Yes': 1
+    },
+    'Hypoacusis': {
+        'No': 0,
+        'Yes': 1
+    },
+    'Defect': {
+        'No': 0,
+        'Yes': 1
+    },
+    'Conscience': {
+        'No': 0,
+        'Yes': 1
+    },
+    'DPF': {
+        'No': 0,
+        'Yes': 1
+    }
 }
 
+# Define feature descriptions for migraine dataset
 migraine_descriptions = {
     'Age': 'Age of the patient',
     'Frequency': 'How often do you experience headaches?',
@@ -288,21 +347,45 @@ migraine_descriptions = {
     'DPF': 'Do you have a family history of migraines?'
 }
 
+# Define feature mappings for headache dataset
 headache_mappings = {
     'headache_days': {
-        'Hours': 0.5, 'Weeks': 7.5, 'A Year': 186,
-        'Months': 15, 'More than a Year': 366
+        'Hours': 0.5,
+        'Weeks': 7.5,
+        'A Year': 186,
+        'Months': 15,
+        'More than a Year': 366
     },
     'durationGroup': {
-        'Less than 1 minute': 0, '3-5 minutes': 1, '2-4 minutes': 2,
-        '4-15 minutes': 3, '15-30 minutes': 4, '30 minutes - 3 hours': 5,
-        '3-4 hours': 6, '4 hours - 3 days': 7, '3-7 days': 8, 'More than 1 week': 9
+        'Less than 1 minute': 0,
+        '3-5 minutes': 1,
+        '2-4 minutes': 2,
+        '4-15 minutes': 3,
+        '15-30 minutes': 4,
+        '30 minutes - 3 hours': 5,
+        '3-4 hours': 6,
+        '4 hours - 3 days': 7,
+        '3-7 days': 8,
+        'More than 1 week': 9
     },
-    'location': {'Unilateral': 0, 'Orbital': 1, 'Bilateral': 2},
-    'severity': {'Mild': 0, 'Moderate': 1, 'Severe': 2},
-    'characterisation': {'Pressing': 0, 'Pulsating': 1, 'Stabbing': 2}
+    'location': {
+        'Unilateral': 0,
+        'Orbital': 1,
+        'Bilateral': 2
+    },
+    'severity': {
+        'Mild': 0,
+        'Moderate': 1,
+        'Severe': 2
+    },
+    'characterisation': {
+        'Pressing': 0,
+        'Pulsating': 1,
+        'Stabbing': 2
+    }
 }
 
+# Define feature descriptions for headache dataset
 headache_descriptions = {
     'durationGroup': 'How long do your headaches typically last?',
     'photophobia': 'Are you sensitive to light?',
@@ -323,91 +406,152 @@ headache_descriptions = {
     'agitation': 'Do you feel restless during headaches?'
 }
 
+# Binary features for headache dataset (yes/no)
 headache_binary_features = [
     'photophobia', 'nausea', 'aggravation', 'phonophobia', 'rhinorrhoea',
     'lacrimation', 'conjunctival_injection', 'pericranial', 'eyelid_oedema',
     'sweating', 'nasal_congestion', 'agitation'
 ]
 
+# Class labels
 migraine_classes = [
-    'Typical aura with migraine', 'Migraine without aura',
-    'Typical aura without migraine', 'Familial hemiplegic migraine',
-    'Sporadic hemiplegic migraine', 'Basilar-type aura', 'Other'
+    'Typical aura with migraine',
+    'Migraine without aura',
+    'Typical aura without migraine',
+    'Familial hemiplegic migraine',
+    'Sporadic hemiplegic migraine',
+    'Basilar-type aura',
+    'Other'
 ]
 
-headache_classes = ['Migraine', 'Cluster', 'Tension-type']
+headache_classes = [
+    'Migraine',
+    'Cluster',
+    'Tension-type'
+]
 
+# Define actual feature names for each dataset (matching training data)
 migraine_feature_names = [
-    'Age', 'Frequency', 'Location', 'Character', 'Intensity',
+    'Age', 'Frequency', 'Location', 'Character', 'Intensity', 
     'Vomit', 'Phonophobia', 'Photophobia', 'Visual', 'Sensory',
     'Dysphasia', 'Vertigo', 'Tinnitus', 'Hypoacusis', 'Defect',
     'Conscience', 'DPF'
 ]
 
 headache_feature_names = [
-    'durationGroup', 'photophobia', 'nausea', 'aggravation',
-    'characterisation_pulsating', 'phonophobia', 'severity',
-    'rhinorrhoea', 'headache_days', 'location_unilateral',
-    'lacrimation', 'conjunctival_injection', 'characterisation_stabbing',
-    'pericranial', 'eyelid_oedema', 'location_orbital',
+    'durationGroup', 'photophobia', 'nausea', 'aggravation', 
+    'characterisation_pulsating', 'phonophobia', 'severity', 
+    'rhinorrhoea', 'headache_days', 'location_unilateral', 
+    'lacrimation', 'conjunctival_injection', 'characterisation_stabbing', 
+    'pericranial', 'eyelid_oedema', 'location_orbital', 
     'sweating', 'nasal_congestion', 'agitation'
 ]
 
+# Define plot explanations for non-technical users (removed IG)
 plot_explanations = {
     'shap': "SHAP shows how each feature contributed to the prediction. Red features increased the probability, blue features decreased it.",
     'lime': "LIME highlights the most important features for this prediction. Green bars support the prediction, red bars contradict it."
 }
 
+# Routes
 @app.route('/')
 def index():
     return render_template('index.html', now=datetime.now())
 
 @app.route('/migraine')
 def migraine():
-    return render_template('migraine.html',
-                           mappings=migraine_mappings,
-                           descriptions=migraine_descriptions)
+    return render_template('migraine.html', 
+                          mappings=migraine_mappings, 
+                          descriptions=migraine_descriptions)
 
 @app.route('/headache')
 def headache():
-    return render_template('headache.html',
-                           mappings=headache_mappings,
-                           descriptions=headache_descriptions,
-                           binary_features=headache_binary_features)
+    return render_template('headache.html', 
+                          mappings=headache_mappings, 
+                          descriptions=headache_descriptions,
+                          binary_features=headache_binary_features)
 
 @app.route('/predict_migraine', methods=['POST'])
 def predict_migraine():
     print("Received migraine prediction request")
     try:
+        # Check if models are loaded
         if migraine_model is None or migraine_scaler is None:
             return jsonify({'error': 'Model not loaded properly. Please check server logs.'}), 500
+            
+        # Check if all fields are filled
         if not all(request.form.values()):
             return jsonify({'error': 'Please fill in all fields'}), 400
+        
+        # Process form data
         input_data = []
+        
+        # Age
         input_data.append(float(request.form['age']))
+        
+        # Frequency
         input_data.append(float(request.form['frequency']))
+        
+        # Location
         input_data.append(migraine_mappings['Location'][request.form['location']])
+        
+        # Character
         input_data.append(migraine_mappings['Character'][request.form['character']])
+        
+        # Intensity
         input_data.append(migraine_mappings['Intensity'][request.form['intensity']])
+        
+        # Vomit
         input_data.append(migraine_mappings['Vomit'][request.form['vomit']])
+        
+        # Phonophobia
         input_data.append(migraine_mappings['Phonophobia'][request.form['phonophobia']])
+        
+        # Photophobia
         input_data.append(migraine_mappings['Photophobia'][request.form['photophobia']])
+        
+        # Visual
         input_data.append(float(request.form['visual']))
+        
+        # Sensory
         input_data.append(float(request.form['sensory']))
+        
+        # Dysphasia
         input_data.append(migraine_mappings['Dysphasia'][request.form['dysphasia']])
+        
+        # Vertigo
         input_data.append(migraine_mappings['Vertigo'][request.form['vertigo']])
+        
+        # Tinnitus
         input_data.append(migraine_mappings['Tinnitus'][request.form['tinnitus']])
+        
+        # Hypoacusis
         input_data.append(migraine_mappings['Hypoacusis'][request.form['hypoacusis']])
+        
+        # Defect
         input_data.append(migraine_mappings['Defect'][request.form['defect']])
+        
+        # Conscience
         input_data.append(migraine_mappings['Conscience'][request.form['conscience']])
+        
+        # DPF
         input_data.append(migraine_mappings['DPF'][request.form['dpf']])
+        
+        # Convert to numpy array and reshape
         input_data = np.array(input_data).reshape(1, -1)
+        
+        # Make prediction
         prediction, confidence = make_prediction(migraine_model, migraine_scaler, input_data)
         print(f"Migraine prediction: {prediction}, confidence: {confidence}")
+        
+        # Generate interpretability plots with actual feature names
         plots = generate_plots(migraine_model, migraine_scaler, input_data, migraine_classes, prediction, migraine_feature_names)
+        
+        # Determine recommendation
         recommendation = None
         if migraine_classes[prediction] == 'Other':
             recommendation = 'headache'
+        
         return jsonify({
             'prediction': migraine_classes[prediction],
             'confidence': confidence,
@@ -423,39 +567,92 @@ def predict_migraine():
 def predict_headache():
     print("Received headache prediction request")
     try:
+        # Check if models are loaded
         if headache_model is None or headache_scaler is None:
             return jsonify({'error': 'Model not loaded properly. Please check server logs.'}), 500
+            
+        # Check if all fields are filled
         if not all(request.form.values()):
             return jsonify({'error': 'Please fill in all fields'}), 400
+        
+        # Process form data to create the 19 features in the correct order
         input_data = []
+        
+        # 1. durationGroup
         input_data.append(headache_mappings['durationGroup'][request.form['durationGroup']])
+        
+        # 2. photophobia
         input_data.append(1 if request.form['photophobia'] == 'Yes' else 0)
+        
+        # 3. nausea
         input_data.append(1 if request.form['nausea'] == 'Yes' else 0)
+        
+        # 4. aggravation
         input_data.append(1 if request.form['aggravation'] == 'Yes' else 0)
+        
+        # 5. characterisation_pulsating (derived from characterisation)
         characterisation = request.form['characterisation']
         input_data.append(1 if characterisation == 'Pulsating' else 0)
+        
+        # 6. phonophobia
         input_data.append(1 if request.form['phonophobia'] == 'Yes' else 0)
+        
+        # 7. severity
         input_data.append(headache_mappings['severity'][request.form['severity']])
+        
+        # 8. rhinorrhoea
         input_data.append(1 if request.form['rhinorrhoea'] == 'Yes' else 0)
-        input_data.append(headache_mappings['headache_days'][request.form['headache_days']])
+        
+        # 9. headache_days - get the numeric value directly from the mapping
+        headache_days_display = request.form['headache_days']
+        input_data.append(headache_mappings['headache_days'][headache_days_display])
+        
+        # 10. location_unilateral (derived from location)
         location = request.form['location']
         input_data.append(1 if location == 'Unilateral' else 0)
+        
+        # 11. lacrimation
         input_data.append(1 if request.form['lacrimation'] == 'Yes' else 0)
+        
+        # 12. conjunctival_injection
         input_data.append(1 if request.form['conjunctival_injection'] == 'Yes' else 0)
+        
+        # 13. characterisation_stabbing (derived from characterisation)
         input_data.append(1 if characterisation == 'Stabbing' else 0)
+        
+        # 14. pericranial
         input_data.append(1 if request.form['pericranial'] == 'Yes' else 0)
+        
+        # 15. eyelid_oedema
         input_data.append(1 if request.form['eyelid_oedema'] == 'Yes' else 0)
+        
+        # 16. location_orbital (derived from location)
         input_data.append(1 if location == 'Orbital' else 0)
+        
+        # 17. sweating
         input_data.append(1 if request.form['sweating'] == 'Yes' else 0)
+        
+        # 18. nasal_congestion
         input_data.append(1 if request.form['nasal_congestion'] == 'Yes' else 0)
+        
+        # 19. agitation
         input_data.append(1 if request.form['agitation'] == 'Yes' else 0)
+        
+        # Convert to numpy array and reshape
         input_data = np.array(input_data).reshape(1, -1)
+        
+        # Make prediction
         prediction, confidence = make_prediction(headache_model, headache_scaler, input_data)
         print(f"Headache prediction: {prediction}, confidence: {confidence}")
+        
+        # Generate interpretability plots with actual feature names
         plots = generate_plots(headache_model, headache_scaler, input_data, headache_classes, prediction, headache_feature_names)
+        
+        # Determine recommendation
         recommendation = None
         if headache_classes[prediction] == 'Migraine':
             recommendation = 'migraine'
+        
         return jsonify({
             'prediction': headache_classes[prediction],
             'confidence': confidence,
@@ -468,75 +665,120 @@ def predict_headache():
         return jsonify({'error': str(e)}), 500
 
 def make_prediction(model, scaler, input_data):
+    """Make prediction with the model"""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    # Scale input
     input_scaled = scaler.transform(input_data)
+    
+    # Convert to tensor
     input_tensor = torch.tensor(input_scaled, dtype=torch.float32).to(device)
+    
+    # Make prediction
     with torch.no_grad():
         outputs = model(input_tensor)
         probabilities = torch.nn.functional.softmax(outputs, dim=1).cpu().numpy()[0]
         prediction = np.argmax(probabilities)
         confidence = probabilities[prediction]
+    
     return prediction, float(confidence)
 
 def generate_plots(model, scaler, input_data, class_names, prediction, feature_names):
+    """Generate SHAP and LIME plots (IG removed)"""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+    
+    # Create a function for model prediction (for SHAP and LIME)
     def predict_fn(data):
+        # data is a numpy array of unscaled values
         data_scaled = scaler.transform(data)
         data_tensor = torch.tensor(data_scaled, dtype=torch.float32).to(device)
         with torch.no_grad():
             outputs = model(data_tensor)
             probs = torch.nn.functional.softmax(outputs, dim=1).cpu().numpy()
         return probs
-
+    
+    # For SHAP: create a model function that applies scaling internally
     def model_fn_scaled(x):
+        # x is a DataFrame or numpy array of unscaled data
         x_scaled = scaler.transform(x)
         x_tensor = torch.tensor(x_scaled, dtype=torch.float32).to(device)
         with torch.no_grad():
             logits = model(x_tensor)
         return logits.cpu().numpy()
-
+    
+    # Create a DataFrame for the input sample with actual feature names
     X_one_df = pd.DataFrame(input_data, columns=feature_names)
+    
+    # Create a small background dataset (unscaled) - we'll use random data around the input
     background_unscaled = pd.DataFrame(
         np.random.randn(100, input_data.shape[1]) * 0.1 + input_data,
         columns=feature_names
     )
+    
+    # Generate plots and convert to base64
     plots = {}
-
+    
+    # SHAP Waterfall plot for the predicted class
     try:
+        # Create SHAP explainer
         explainer_shap = shap.Explainer(model_fn_scaled, background_unscaled)
+        
+        # Compute SHAP values
         shap_values = explainer_shap(X_one_df)
-        plt.figure(figsize=(10, 6))
+        
+        # Plot SHAP waterfall for predicted class only with larger figure size
+        plt.figure(figsize=(10, 6))  # Increased figure size
         shap.plots.waterfall(shap_values[0][:, prediction], show=False)
-        plt.figtext(0.5, 0.01, plot_explanations['shap'], ha="center", fontsize=10,
-                    bbox={"facecolor": "white", "alpha": 0.5, "pad": 5})
-        plt.tight_layout()
-        plt.subplots_adjust(bottom=0.15)
+        
+        # Add explanation text
+        plt.figtext(0.5, 0.01, plot_explanations['shap'], ha="center", fontsize=10, 
+                   bbox={"facecolor":"white", "alpha":0.5, "pad":5})
+        
+        plt.tight_layout()  # Ensure everything fits
+        plt.subplots_adjust(bottom=0.15)  # Make room for the explanation text
+        
         buf = BytesIO()
-        plt.savefig(buf, format='png', bbox_inches='tight')
+        plt.savefig(buf, format='png', bbox_inches='tight')  # bbox_inches='tight' prevents cutting off
         buf.seek(0)
         plots['shap'] = base64.b64encode(buf.read()).decode('utf-8')
         plt.close()
     except Exception as e:
         print(f"Error generating SHAP plot: {str(e)}")
+        # Fallback to bar plot
         try:
+            # Use KernelExplainer as fallback
             background_scaled = scaler.transform(background_unscaled)
             explainer_fallback = shap.KernelExplainer(predict_fn, background_scaled)
             shap_values_fallback = explainer_fallback.shap_values(input_data)
-            plt.figure(figsize=(10, 6))
+            
+            plt.figure(figsize=(10, 6))  # Consistent figure size
+            
+            # For multi-class models, shap_values is a list of arrays (one per class)
             if isinstance(shap_values_fallback, list):
-                class_shap_values = shap_values_fallback[prediction][0]
+                # Multi-class case - extract values for the predicted class
+                class_shap_values = shap_values_fallback[prediction][0]  # Get values for the predicted class, first sample
             else:
+                # Binary case
                 class_shap_values = shap_values_fallback[0]
-            shap_df = pd.DataFrame({'Feature': feature_names, 'SHAP Value': class_shap_values})
+            
+            # Create a bar plot of SHAP values
+            shap_df = pd.DataFrame({
+                'Feature': feature_names,
+                'SHAP Value': class_shap_values
+            })
             shap_df = shap_df.sort_values('SHAP Value', ascending=False)
+            
             plt.barh(shap_df['Feature'], shap_df['SHAP Value'])
             plt.xlabel('SHAP Value')
             plt.title(f'SHAP Feature Importance for {class_names[prediction]}')
-            plt.figtext(0.5, 0.01, plot_explanations['shap'], ha="center", fontsize=10,
-                        bbox={"facecolor": "white", "alpha": 0.5, "pad": 5})
+            
+            # Add explanation text
+            plt.figtext(0.5, 0.01, plot_explanations['shap'], ha="center", fontsize=10, 
+                       bbox={"facecolor":"white", "alpha":0.5, "pad":5})
+            
             plt.tight_layout()
-            plt.subplots_adjust(bottom=0.15)
+            plt.subplots_adjust(bottom=0.15)  # Make room for the explanation text
+            
             buf = BytesIO()
             plt.savefig(buf, format='png', bbox_inches='tight')
             buf.seek(0)
@@ -551,37 +793,51 @@ def generate_plots(model, scaler, input_data, class_names, prediction, feature_n
             buf.seek(0)
             plots['shap'] = base64.b64encode(buf.read()).decode('utf-8')
             plt.close()
-
+    
+    # LIME plot
     try:
+        # For LIME, we use scaled data
         background_scaled = scaler.transform(background_unscaled)
         explainer_lime = lime.lime_tabular.LimeTabularExplainer(
             training_data=background_scaled,
-            feature_names=feature_names,
+            feature_names=feature_names,  # Use actual feature names
             class_names=class_names,
             mode='classification'
         )
+        
+        # Generate LIME explanation for the scaled input
         exp_lime = explainer_lime.explain_instance(
             scaler.transform(input_data)[0],
             predict_fn=lambda x: predict_fn(scaler.inverse_transform(x)),
             num_features=min(10, input_data.shape[1]),
             top_labels=1
         )
+        
+        # Get the explanation for the predicted class
         lime_exp = exp_lime.as_list(label=prediction)
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(10, 6))  # Consistent figure size
+        
+        # Extract feature names and values
         features = [x[0] for x in lime_exp]
         values = [x[1] for x in lime_exp]
+        
+        # Create horizontal bar chart
         colors = ['green' if x > 0 else 'red' for x in values]
         y_pos = np.arange(len(features))
         ax.barh(y_pos, values, align='center', color=colors)
         ax.set_yticks(y_pos)
         ax.set_yticklabels(features)
-        ax.invert_yaxis()
+        ax.invert_yaxis()  # To display the most important feature at the top
         ax.set_xlabel('Weight')
         ax.set_title(f'LIME Explanation for {class_names[prediction]}')
-        plt.figtext(0.5, 0.01, plot_explanations['lime'], ha="center", fontsize=10,
-                    bbox={"facecolor": "white", "alpha": 0.5, "pad": 5})
+        
+        # Add explanation text
+        plt.figtext(0.5, 0.01, plot_explanations['lime'], ha="center", fontsize=10, 
+                   bbox={"facecolor":"white", "alpha":0.5, "pad":5})
+        
         plt.tight_layout()
-        plt.subplots_adjust(bottom=0.15)
+        plt.subplots_adjust(bottom=0.15)  # Make room for the explanation text
+        
         buf = BytesIO()
         plt.savefig(buf, format='png', bbox_inches='tight')
         buf.seek(0)
@@ -596,8 +852,10 @@ def generate_plots(model, scaler, input_data, class_names, prediction, feature_n
         buf.seek(0)
         plots['lime'] = base64.b64encode(buf.read()).decode('utf-8')
         plt.close()
-
+    
     return plots
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+    
