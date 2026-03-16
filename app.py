@@ -22,7 +22,6 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
 
-
 def ensure_models():
     model_files = [
         "headache_model.pth",
@@ -34,9 +33,9 @@ def ensure_models():
         if not os.path.exists(filename):
             print(f"Downloading {filename}...")
             hf_hub_download(
-                repo_id="dewanjee/NeuroTab",
+                repo_id="dewanjee/NeuroTab-models",
                 filename=filename,
-                repo_type="space",
+                repo_type="model",
                 local_dir="."
             )
             print(f"Downloaded {filename}")
