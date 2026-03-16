@@ -1,6 +1,5 @@
 ---
 title: NeuroTab
-emoji: í· 
 colorFrom: blue
 colorTo: purple
 sdk: docker
