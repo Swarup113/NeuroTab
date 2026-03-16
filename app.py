@@ -44,7 +44,6 @@ def ensure_models():
             print(f"Downloaded {filename}")
 
 ensure_models()
-```
 
 Then add `huggingface_hub` to your `requirements.txt`:
 ```
