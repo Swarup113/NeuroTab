@@ -21,6 +21,7 @@ import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
+from huggingface_hub import hf_hub_download
 
 def ensure_models():
     model_files = [
