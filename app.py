@@ -233,8 +233,8 @@ def load_model(model_path, scaler_path, num_classes):
 
 # Load the models
 try:
-    migraine_model, migraine_scaler = load_model('models/migraine_model.pth', 'models/migraine_scaler.pkl', num_classes=7)
-    headache_model, headache_scaler = load_model('models/headache_model.pth', 'models/headache_scaler.pkl', num_classes=3)
+    migraine_model, migraine_scaler = load_model('migraine_model.pth', 'migraine_scaler.pkl', num_classes=7)
+    headache_model, headache_scaler = load_model('headache_model.pth', 'headache_scaler.pkl', num_classes=3)
     print("Models loaded successfully")
 except Exception as e:
     print(f"Error loading models: {e}")
