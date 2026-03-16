@@ -45,8 +45,6 @@ def ensure_models():
 
 ensure_models()
 
-Then add `huggingface_hub` to your `requirements.txt`:
-```
 --extra-index-url https://download.pytorch.org/whl/cpu
 Flask==3.1.1
 gunicorn==23.0.0
