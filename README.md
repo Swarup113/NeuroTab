@@ -70,7 +70,7 @@ The model was trained on clinical datasets of migraine and headache patients. Tw
 
 To visualize how the system works, here’s a detailed **User Flow Diagram** that describes the entire process:
 
-![User Flow Diagram](Snapshots/User Flow Diagram.pdf)
+![User Flow Diagram](Snapshots/User%20Flow%20Diagram.pdf)
 
 ---
 
@@ -80,7 +80,7 @@ To visualize how the system works, here’s a detailed **User Flow Diagram** tha
 
 The landing page is designed for intuitive use, allowing users to easily navigate through the tool. Here’s a screenshot of the landing page interface:
 
-![Landing Page](Snapshots/Landing\ Page/Landing\ Page.png)
+![Landing Page](Snapshots/Landing%20Page/Landing%20Page.png)
 
 ---
 
@@ -90,23 +90,23 @@ This diagnostic module is responsible for classifying general headaches into **M
 
 1. **Input Form** – The user inputs the clinical symptoms for diagnosis.
 
-   ![Input Form](Snapshots/Headache\ Type\ Classification/Input\ Form.png)
+   ![Input Form](Snapshots/Headache%20Type%20Classification/Input%20Form.png)
 
 2. **Prediction on Sample Inputs** – Based on the input data, the model predicts the most likely headache type.
 
-   ![Prediction on Sample Inputs](Snapshots/Headache\ Type\ Classification/Prediction\ on\ Sample\ Inputs.png)
+   ![Prediction on Sample Inputs](Snapshots/Headache%20Type%20Classification/Prediction%20on%20Sample%20Inputs.png)
 
 3. **Recommendation** – If the model predicts a migraine, it recommends checking for migraine subtypes.
 
-   ![Recommendation](Snapshots/Headache\ Type\ Classification/Recommendation.png)
+   ![Recommendation](Snapshots/Headache%20Type%20Classification/Recommendation.png)
 
 4. **Explainability** – The model’s decision-making process is explained using LIME and SHAP plots.
 
    - **LIME plot**:
-     ![XAI (LIME Plot)](Snapshots/Headache\ Type\ Classification/XAI\ \(LIME\ Plot\).png)
+     ![XAI (LIME Plot)](Snapshots/Headache%20Type%20Classification/XAI%20%28LIME%20Plot%29.png)
 
    - **SHAP plot**:
-     ![XAI (SHAP plot)](Snapshots/Headache\ Type\ Classification/XAI\ \(SHAP\ plot\).png)
+     ![XAI (SHAP plot)](Snapshots/Headache%20Type%20Classification/XAI%20%28SHAP%20plot%29.png)
 
 ---
 
@@ -116,19 +116,19 @@ This diagnostic module classifies **migraine subtypes** based on input symptoms,
 
 1. **Input Form** – The user provides migraine-specific symptom data.
 
-   ![Input Form](Snapshots/Migraine\ Variants\ Classification/Input\ Form.png)
+   ![Input Form](Snapshots/Migraine%20Variants%20Classification/Input%20Form.png)
 
 2. **Prediction on Sample Input** – The model predicts the most likely migraine subtype based on the inputs.
 
-   ![Prediction on Sample Input](Snapshots/Migraine\ Variants\ Classification/Prediction\ on\ Sample\ Input.png)
+   ![Prediction on Sample Input](Snapshots/Migraine%20Variants%20Classification/Prediction%20on%20Sample%20Input.png)
 
 3. **Explainability** – The model’s decision-making process is visualized using LIME and SHAP plots.
 
    - **LIME plot**:
-     ![XAI (LIME Plot)](Snapshots/Migraine\ Variants\ Classification/XAI\ \(LIME\ Plot\).png)
+     ![XAI (LIME Plot)](Snapshots/Migraine%20Variants%20Classification/XAI%20%28LIME%20Plot%29.png)
 
    - **SHAP plot**:
-     ![XAI (SHAP plot)](Snapshots/Migraine\ Variants\ Classification/XAI\ \(SHAP\ plot\).png)
+     ![XAI (SHAP plot)](Snapshots/Migraine%20Variants%20Classification/XAI%20%28SHAP%20plot%29.png)
 
 ---
 
