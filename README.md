@@ -2,6 +2,9 @@
 
 > A web-based Clinical Decision Support System (CDSS) that uses a custom-trained TabNet deep learning model to classify neurological headache disorders, with explainable AI (XAI) insights for clinical interpretability.
 
+## Live Demo
+The application is hosted on HuggingFace Spaces:
+**[https://huggingface.co/spaces/dewanjee/NeuroTab](https://huggingface.co/spaces/dewanjee/NeuroTab)**
 
 ##  Overview
 
@@ -11,9 +14,7 @@ The system supports two diagnostic pathways:
 - **Migraine Classification** — classifies into 7 migraine subtypes based on the International Headache Society (IHS) criteria
 - **Headache Classification** — differentiates between Migraine, Cluster headache, and Tension-type headache
 
-## Live Demo
-The application is hosted on HuggingFace Spaces:
-**[https://huggingface.co/spaces/dewanjee/NeuroTab](https://huggingface.co/spaces/dewanjee/NeuroTab)**
+----
 
 ## Features
 
@@ -25,6 +26,7 @@ The application is hosted on HuggingFace Spaces:
 - **Non-technical UI** — plain-language explanations of XAI plots designed for clinical users
 - **Fully Responsive Web Interface** — works on desktop and mobile browsers
 
+----
 
 ##  How It Works
 
