@@ -70,7 +70,7 @@ The model was trained on clinical datasets of migraine and headache patients. Tw
 
 To visualize how the system works, here’s a detailed **User Flow Diagram** that describes the entire process:
 
-![User Flow Diagram](Snapshots/User\ Flow\ Diagram.pdf)
+![User Flow Diagram](Snapshots/User Flow Diagram.pdf)
 
 ---
 
@@ -80,7 +80,7 @@ To visualize how the system works, here’s a detailed **User Flow Diagram** tha
 
 The landing page is designed for intuitive use, allowing users to easily navigate through the tool. Here’s a screenshot of the landing page interface:
 
-![Landing Page](Snapshots/Landing\ Page/Landing\ Page.png)
+![Landing Page](Snapshots/Landing Page/Landing Page.png)
 
 ---
 
